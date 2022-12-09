@@ -1,0 +1,24 @@
+name: sqlite3
+on: [workflow_dispatch]
+env:
+  branch: begin-concurrent-pnu-wal2
+jobs:
+  prepare-amalgamation:
+    name: Build sqlite3.c/.h (Ubuntu, branch ${{env.branch}})
+    runs-on: ubuntu-latest
+    steps:
+    - run: sudo apt-get update && sudo apt-get install tcl tcl-dev -y
+    - uses: actions/checkout@v3
+      with:
+        repository: 'sqlite/sqlite'
+        ref: '${{env.branch}}'
+    - run: ./configure
+    - run: make sqlite3.c
+    - name: Upload amalgamation
+      uses: actions/upload-artifact@v3
+      with:
+        name: sqlite3
+        if-no-files-found: error
+        path: |
+          sqlite3.c
+          sqlite3.h
