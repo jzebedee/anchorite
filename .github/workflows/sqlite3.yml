@@ -1,17 +1,17 @@
 name: sqlite3
 on: [workflow_dispatch]
 env:
-  branch: begin-concurrent-pnu-wal2
+  sqlite_branch: 'begin-concurrent-pnu-wal2'
 jobs:
   prepare-amalgamation:
-    name: Build sqlite3.c/.h (Ubuntu, branch ${{env.branch}})
+    name: Build sqlite3.c/.h (Ubuntu, branch ${{env.sqlite_branch}})
     runs-on: ubuntu-latest
     steps:
     - run: sudo apt-get update && sudo apt-get install tcl tcl-dev -y
     - uses: actions/checkout@v3
       with:
         repository: 'sqlite/sqlite'
-        ref: '${{env.branch}}'
+        ref: '${{env.sqlite_branch}}'
     - run: ./configure
     - run: make sqlite3.c
     - name: Upload amalgamation
