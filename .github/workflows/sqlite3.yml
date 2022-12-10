@@ -22,7 +22,7 @@ jobs:
     - run: ./configure
     - run: make sqlite3.c
     - run: make test
-      if: ${{ inputs.run_tests || !env.act }} #fails under root
+      if: ${{ inputs.run_tests && !env.act }} #fails under root
     - name: Upload amalgamation
       uses: actions/upload-artifact@v3
       with:
