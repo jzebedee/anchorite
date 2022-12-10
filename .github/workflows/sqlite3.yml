@@ -55,11 +55,26 @@ jobs:
         install: >
           make
           mingw-w64-${{matrix.env}}-cc
-    - run: gcc -shared sqlite3.c -O2 -o sqlite3.dll
+    - name: Build libs
+      run: |
+      gcc -shared sqlite3.c -O2 -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 -o sqlite3.dll
+    - name: Build CLI
+      run: |
+      gcc -Os -I. -DSQLITE_THREADSAFE=0 -DSQLITE_ENABLE_EXPLAIN_COMMENTS \
+        -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
+        shell.c sqlite3.c -ldl -lm -o sqlite3.exe
     - name: Upload libs
       uses: actions/upload-artifact@v3
       with:
         name: lib_sqlite3
         if-no-files-found: error
         path: |
+          sqlite3.dll
+    - name: Upload CLI
+      uses: actions/upload-artifact@v3
+      with:
+        name: bin_sqlite3
+        if-no-files-found: error
+        path: |
+          sqlite3.exe
           sqlite3.dll
