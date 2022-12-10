@@ -5,20 +5,24 @@ on:
       sqlite_branch: #begin-concurrent-pnu-wal2
         required: true
         type: string
+      run_tests:
+        required: false
+        type: boolean
 
 jobs:
   prepare-amalgamation:
-    name: Build sqlite3.c/.h (Ubuntu, branch ${{inputs.sqlite_branch}})
+    name: Build sqlite3.c/.h (Ubuntu, branch ${{ inputs.sqlite_branch }})
     runs-on: ubuntu-latest
     steps:
     - run: sudo apt-get update && sudo apt-get install tcl tcl-dev -y
     - uses: actions/checkout@v3
       with:
         repository: 'sqlite/sqlite'
-        ref: '${{inputs.sqlite_branch}}'
+        ref: '${{ inputs.sqlite_branch }}'
     - run: ./configure
     - run: make sqlite3.c
     - run: make test
+      if: ${{ inputs.run_tests || !env.act }} #fails under root
     - name: Upload amalgamation
       uses: actions/upload-artifact@v3
       with:
@@ -27,3 +31,35 @@ jobs:
         path: |
           sqlite3.c
           sqlite3.h
+  build-windows-msys2:
+    name: Build libs (Windows, MSYS2, ${{matrix.sys}})
+    needs: prepare-amalgamation
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+        - { sys: mingw64, env: x86_64 }
+        - { sys: mingw32, env: i686 }
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: sqlite3
+    - uses: actions/checkout@v3
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{matrix.sys}}
+        update: true
+        install: >
+          make
+          mingw-w64-${{matrix.env}}-cc
+    - run: gcc -shared sqlite3.c -O2 -o sqlite3.dll
+    - name: Upload libs
+      uses: actions/upload-artifact@v3
+      with:
+        name: lib_sqlite3
+        if-no-files-found: error
+        path: |
+          sqlite3.dll
