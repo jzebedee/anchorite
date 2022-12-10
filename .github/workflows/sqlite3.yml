@@ -11,7 +11,7 @@ on:
 
 jobs:
   prepare-amalgamation:
-    name: Build sqlite3.c/.h (Ubuntu, branch ${{ inputs.sqlite_branch }})
+    name: Build sqlite3 amalgamation (Ubuntu, branch ${{ inputs.sqlite_branch }})
     runs-on: ubuntu-latest
     steps:
     - run: sudo apt-get update && sudo apt-get install tcl tcl-dev -y
@@ -31,6 +31,7 @@ jobs:
         path: |
           sqlite3.c
           sqlite3.h
+          shell.c
   build-windows-msys2:
     name: Build libs (Windows, MSYS2, ${{matrix.sys}})
     needs: prepare-amalgamation
@@ -77,4 +78,3 @@ jobs:
         if-no-files-found: error
         path: |
           sqlite3.exe
-          sqlite3.dll
