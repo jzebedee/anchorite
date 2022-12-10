@@ -56,6 +56,7 @@ jobs:
         install: >
           make
           mingw-w64-${{matrix.env}}-cc
+          mingw-w64-${{matrix.env}}-dlfcn
     - name: Build libs
       run: |
         gcc -shared sqlite3.c -O2 -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 -o sqlite3.dll
