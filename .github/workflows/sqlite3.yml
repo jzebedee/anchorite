@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: sudo apt-get update && sudo apt-get install tcl tcl-dev -y
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: 'sqlite/sqlite'
         ref: '${{ inputs.sqlite_branch }}'
@@ -24,7 +24,7 @@ jobs:
     - run: make test
       if: ${{ inputs.run_tests && !env.act }} #fails under root
     - name: Upload amalgamation
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sqlite3
         if-no-files-found: error
@@ -45,8 +45,8 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/download-artifact@v3
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
       with:
         name: sqlite3
     - uses: msys2/setup-msys2@v2
@@ -66,14 +66,14 @@ jobs:
         -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_JSON1 \
         shell.c sqlite3.c -ldl -lm -o sqlite3.exe
     - name: Upload libs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: lib_sqlite3
         if-no-files-found: error
         path: |
           sqlite3.dll
     - name: Upload CLI
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: bin_sqlite3
         if-no-files-found: error
